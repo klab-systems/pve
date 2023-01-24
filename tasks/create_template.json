@@ -2,7 +2,7 @@
   "puppet_task_version": 1,
   "supports_noop": false,
   "description": "Generates a template in Promox",
-  "input_method": "stdin",
+  "input_method": "environment",
   "parameters": {
     "vmid": {
       "description": "VMID in proxmox for the template. Minimum of 100.",
