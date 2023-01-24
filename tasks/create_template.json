@@ -5,7 +5,7 @@
   "input_method": "stdin",
   "parameters": {
     "vmid": {
-      "description": "VMID in proxmox for the template. Minimum of 100, Defaults to 900 and must be unique",
+      "description": "VMID in proxmox for the template. Minimum of 100.",
       "type": "Optional[Integer]",
       "default": 900
     }
