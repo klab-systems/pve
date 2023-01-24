@@ -27,7 +27,7 @@ if [ -z "$vmidcheck" ]; then
     qm importdisk $PT_vmid /tmp/focal-server-cloudimg-amd64.img local-lvm
 
     # Attach the new disk to the vm
-    qm set $PT_vmid --scsihw virtio-scsi-pci --scsi0 local-lvm:base-$PT_vmid-disk-0
+    qm set $PT_vmid --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-$PT_vmid-disk-0
 
     # Add a cloud init drive to VM
     qm set $PT_vmid --ide2 local-lvm:cloudinit
