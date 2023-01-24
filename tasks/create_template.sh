@@ -1,28 +1,42 @@
 #!/bin/sh
-
 # Puppet Task Name: create_template
-#
-# This is where you put the shell code for your task.
-#
-# You can write Puppet tasks in any language you want and it's easy to
-# adapt an existing Python, PowerShell, Ruby, etc. script. Learn more at:
-# https://puppet.com/docs/bolt/0.x/writing_tasks.html
-#
-# Puppet tasks make it easy for you to enable others to use your script. Tasks
-# describe what it does, explains parameters and which are required or optional,
-# as well as validates parameter type. For examples, if parameter "instances"
-# must be an integer and the optional "datacenter" parameter must be one of
-# portland, sydney, belfast or singapore then the .json file
-# would include:
-#   "parameters": {
-#     "instances": {
-#       "description": "Number of instances to create",
-#       "type": "Integer"
-#     },
-#     "datacenter": {
-#       "description": "Datacenter where instances will be created",
-#       "type": "Enum[portland, sydney, belfast, singapore]"
-#     }
-#   }
-# Learn more at: https://puppet.com/docs/bolt/0.x/writing_tasks.html#ariaid-title11
-#
+if [ "$vmid" -lt "100" ]; then
+    echo "vmid Must be <= 100"
+    exit 1
+fi
+
+# Validate that vmid is unique
+vmidcheck=$(qm list | grep $vmid)
+if [ -z "$vmidcheck" ]; then
+    # Download Cloud Image if needed
+    IMGFILE=/tmp/focal-server-cloudimg-amd64.img
+    if [ ! -f "$IMGFILE" ]; then
+    wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img -P /tmp/
+    fi
+
+    # Create virtual machine
+    qm create $vmid --memory 2048 --core 1 --name ubuntu-focal --net0 virtio,bridge=vmbr0
+
+    # Import the downloaded image
+    qm importdisk $vmid /tmp/focal-server-cloudimg-amd64.img local-lvm
+
+    # Attach the new disk to the vm
+    qm set $vmid --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-$vmid-disk-0
+
+    # Add a cloud init drive to VM
+    qm set $vmid --ide2 local-lvm:cloudinit
+
+    # Make the cloud init drive bootable
+    qm set $vmid --boot c --bootdisk scsi0
+
+    # Add serial console
+    qm set $vmid --serial0 socket --vga serial0
+
+    # Convert to template
+    qm template $vmid
+
+    exit 0
+else
+    echo "vmid $vmid already exists"
+    exit 1
+fi
