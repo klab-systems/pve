@@ -8,14 +8,12 @@ fi
 # Validate that vmid is unique
 vmidcheck=$(qm list | grep "$PT_vmid")
 if [ -z "$vmidcheck" ]; then
-    # Check if image is present, if so delete it
+    # Check if image is present, if not delete it
     IMGFILE=/tmp/focal-server-cloudimg-amd64.img
-    if [ -f "$IMGFILE" ]; then
-        rm -f /tmp/focal-server-cloudimg-amd64.img
+    if [ ! -f "$IMGFILE" ]; then
+        # Download latest image
+        wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img -P /tmp/
     fi
-
-    # Download latest image
-    wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img -P /tmp/
 
     # Install qemu agent into image
     virt-customize -a /tmp/focal-server-cloudimg-amd64.img --install qemu-guest-agent
@@ -43,9 +41,6 @@ if [ -z "$vmidcheck" ]; then
 
     # Convert to template
     qm template $PT_vmid
-
-    # Remove source image
-    rm -f /tmp/focal-server-cloudimg-amd64.img
 
     exit 0
 else
