@@ -1,0 +1,7 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "Retrieves a list of VMs on the target proxmox instance",
+  "parameters": {
+  }
+}

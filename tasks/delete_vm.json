@@ -1,0 +1,11 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "Deletes VM from proxmox and all associated disks/configurations",
+  "parameters": {
+    "vmid": {
+      "description": "VMID in proxmox for the vm you want to delete if you don't know run task pve::get_vms to identify the vmid.",
+      "type": "Integer"
+    }
+  }
+}
